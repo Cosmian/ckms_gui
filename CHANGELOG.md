@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.5] - 2024-01-17
+
+### Ci
+
+- Push on package.cosmian.com on remote workflow call
+
 ## [0.1.4] - 2024-01-17
 
 ### Ci
