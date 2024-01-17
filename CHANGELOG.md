@@ -2,17 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.1.2] - 2024-01-17
+## [0.1.3] - 2024-01-17
 
 ### Ci
 
-- Fix check if KMS version variable exists
-
-## [0.1.1] - 2024-01-17
-
-### Ci
-
-- Fix workflow_dispatch input argument syntax
+- Detect input workflow_dispatch
 
 ## [0.1.0] - 2024-01-17
 
