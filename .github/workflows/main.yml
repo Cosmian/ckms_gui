@@ -67,13 +67,10 @@ jobs:
           components: rustfmt, clippy
 
       - name: Set KMS version
+        if: inputs.kms_version
         run: |
-          if [[ -v VERSION ]]; then
-            sed -i "s/4.11.0/${VERSION}/g" Cargo.toml
-            sed -i "s/4.11.0/${VERSION}/g" build.rs
-          else
-            echo "Bash variable VERSION does not exist"
-          fi
+          sed -i "s/4.11.0/${VERSION}/g" Cargo.toml
+          sed -i "s/4.11.0/${VERSION}/g" build.rs
         env:
           VERSION: ${{ inputs.kms_version }}
 
@@ -117,29 +114,22 @@ jobs:
           zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
 
       - name: Push to package.cosmian.com
+        if: inputs.kms_version
         run: |
           set -x
-          if [[ -v VERSION ]]; then
-            DESTINATION_DIR=/mnt/package/kms/last_build/$VERSION
-            ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
-            scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
-          else
-            echo "Bash variable VERSION does not exist"
-          fi
+          DESTINATION_DIR=/mnt/package/kms/last_build/$VERSION
+          ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
+          scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
         env:
           VERSION: ${{ inputs.kms_version }}
 
       - name: Push to package.cosmian.com - tags
-        if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/') && inputs.kms_version
         run: |
           set -x
-          if [[ -v VERSION ]]; then
-            DESTINATION_DIR=/mnt/package/kms/$VERSION
-            ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
-            scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
-          else
-            echo "Bash variable VERSION does not exist"
-          fi
+          DESTINATION_DIR=/mnt/package/kms/$VERSION
+          ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
+          scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
         env:
           VERSION: ${{ inputs.kms_version }}
 
