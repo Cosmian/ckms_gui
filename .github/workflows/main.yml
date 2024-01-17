@@ -5,10 +5,11 @@ on:
   push:
   # Also when triggered by another repo
   workflow_dispatch:
-    kms_version:
-      description: KMS version
-      type: string
-      default: 4.11.0
+    inputs:
+      kms_version:
+        description: KMS version
+        type: string
+        default: 4.11.0
 
 jobs:
   kms-gui-build:
