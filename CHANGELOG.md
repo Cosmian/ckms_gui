@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.6] - 2024-01-17
+
+### Ci
+
+- Fix release: add asset only on tags
+
 ## [0.1.5] - 2024-01-17
 
 ### Ci
