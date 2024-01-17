@@ -1,0 +1,155 @@
+---
+name: KMS GUI build and push
+
+on:
+  push:
+  # Also when triggered by another repo
+  workflow_dispatch:
+    kms_version:
+      description: KMS version
+      type: string
+      default: 4.11.0
+
+jobs:
+  kms-gui-build:
+    name: Build on ${{ matrix.archive_name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-12
+            prerequisites: |
+              rustup target add x86_64-apple-darwin
+            build: |
+              cargo build --release --target x86_64-apple-darwin
+            archive_name: kms_gui_macos
+            kms_gui: ./target/x86_64-apple-darwin/release/kms_gui
+          - os: ubuntu-22.04
+            prerequisites: |
+              sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
+            build: |
+              cargo build --release
+            archive_name: kms_gui_ubuntu_22_04
+            kms_gui: ./target/release/kms_gui
+          # - os: ubuntu-22.04
+          #   prerequisites: |
+          #     sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev
+          #     sudo apt-get install --no-install-recommends -qq libclang-dev gcc-mingw-w64-x86-64
+          #     rustup target add x86_64-pc-windows-gnu
+          #   build: |
+          #     cargo build --release --target x86_64-pc-windows-gnu
+          #   archive_name: kms_gui_windows
+          #   kms_gui: ./target/x86_64-pc-windows-gnu/release/kms_gui
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up cargo cache
+        id: cargo_cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ matrix.os }}-kms-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-${{ matrix.os }}-kms-${{ hashFiles('**/Cargo.lock') }}
+
+      - uses: dtolnay/rust-toolchain@master
+        if: steps.cargo_cache.outputs.cache-hit != 'true'
+        with:
+          toolchain: nightly-2024-01-09
+          components: rustfmt, clippy
+
+      - name: Set KMS version
+        run: |
+          if [ -z ${VERSION+x} ]; then
+            sed -i "s/4.11.0/${VERSION}/g" Cargo.toml
+            sed -i "s/4.11.0/${VERSION}/g" build.rs
+          else
+            echo "Bash variable VERSION does not exist"
+          fi
+        env:
+          VERSION: ${{ inputs.kms_version }}
+
+      - name: Install prerequisites
+        run: ${{ matrix.prerequisites }}
+
+      - name: Build
+        run: ${{ matrix.build }}
+
+      - name: Upload KMS for ${{ matrix.os }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.archive_name }}
+          path: ${{ matrix.kms_gui }}
+          retention-days: 1
+          if-no-files-found: error
+
+  ##############################################################################
+  ### Releases
+  ##############################################################################
+  release:
+    name: release
+    needs:
+      - kms-gui-build
+    runs-on: [self-hosted, not-sgx]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - archive_name: kms_gui_macos
+          - archive_name: kms_gui_ubuntu_22_04
+          # - archive_name: kms_gui_windows
+
+    steps:
+      - uses: actions/download-artifact@v3
+      - run: find .
+
+      - name: Creating zip to be attached to release
+        run: |
+          sudo apt-get install -y zip
+          zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
+
+      - name: Push to package.cosmian.com
+        run: |
+          set -x
+          if [ -z ${VERSION+x} ]; then
+            DESTINATION_DIR=/mnt/package/kms/last_build/$VERSION
+            ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
+            scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
+          else
+            echo "Bash variable VERSION does not exist"
+          fi
+        env:
+          VERSION: ${{ inputs.kms_version }}
+
+      - name: Push to package.cosmian.com - tags
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          set -x
+          if [ -z ${VERSION+x} ]; then
+            DESTINATION_DIR=/mnt/package/kms/$VERSION
+            ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
+            scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
+          else
+            echo "Bash variable VERSION does not exist"
+          fi
+        env:
+          VERSION: ${{ inputs.kms_version }}
+
+      - name: Release on tags, attach asset on release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.archive_name }}.zip
+
+  cleanup:
+    needs:
+      - release
+    uses: Cosmian/reusable_workflows/.github/workflows/cleanup_cache.yml@develop
+    secrets: inherit
