@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.1] - 2024-01-17
+
+### Ci
+
+- Fix workflow_dispatch input argument syntax
+
 ## [0.1.0] - 2024-01-17
 
 ### Features
