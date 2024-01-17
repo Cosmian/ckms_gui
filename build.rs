@@ -1,7 +1,7 @@
 fn main() {
     // get `ckms` `main.rs` file
     let response = reqwest::blocking::get(
-        "https://raw.githubusercontent.com/Cosmian/kms/develop/crate/cli/src/main.rs",
+        "https://raw.githubusercontent.com/Cosmian/kms/4.11.0/crate/cli/src/main.rs",
     )
     .unwrap();
 
