@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [0.1.7] - 2024-01-17
 
+### Changes
+
+- Renaming of the project to `ckms_gui` (CLI KMS GUI)
+
+## [0.1.7] - 2024-01-17
+
 ### Features
 
 - Fetch the latest version of KMS CLI
