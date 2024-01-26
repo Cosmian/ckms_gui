@@ -11,13 +11,16 @@ fn main() {
         .build()
         .unwrap();
 
-    let latest_kms_release = client
-        .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
-        .send()
-        .unwrap()
-        .json::<Release>()
-        .unwrap()
-        .tag_name;
+    // typically the `VERSION` env var is set by the KMS CI release pipeline
+    let latest_kms_release = std::env::var("VERSION").unwrap_or_else(|_| {
+        client
+            .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
+            .send()
+            .unwrap()
+            .json::<Release>()
+            .unwrap()
+            .tag_name
+    });
 
     println!("cargo:warning=Using KMS release {latest_kms_release}");
 
