@@ -1,24 +1,49 @@
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct Release {
+    tag_name: String,
+}
+
 fn main() {
+    let client = reqwest::blocking::Client::builder()
+        .user_agent("Cosmian/KMS_GUI")
+        .build()
+        .unwrap();
+
+    // typically the `VERSION` env var is set by the KMS CI release pipeline
+    let latest_kms_release = std::env::var("VERSION").unwrap_or_else(|_| {
+        client
+            .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
+            .send()
+            .unwrap()
+            .json::<Release>()
+            .unwrap()
+            .tag_name
+    });
+
+    println!("cargo:warning=Using KMS release {latest_kms_release}");
+
     // get `ckms` `main.rs` file
-    let response = reqwest::blocking::get(
-        "https://raw.githubusercontent.com/Cosmian/kms/4.11.0/crate/cli/src/main.rs",
-    )
-    .unwrap();
-
-    let content = response.text().unwrap();
-
-    // println!("cargo:warning={content}");
+    let content = client
+        .get(format!(
+        "https://raw.githubusercontent.com/Cosmian/kms/{latest_kms_release}/crate/cli/src/main.rs"
+    ))
+        .send()
+        .unwrap()
+        .text()
+        .unwrap();
 
     // install Klask hook
     let content = content.replace(
         "async fn main_() -> Result<(), CliError> {\n",
-        "async fn main_() -> Result<(), CliError> {\n
-            let args = std::env::args().collect::<Vec<_>>();\n
-            if args.len() < 2 {\n
-                let cmd = <Cli as CommandFactory>::command();\n
-                klask::run_app(cmd, klask::Settings::default(), |_| {});\n
-                return Ok(())\n
-            }\n",
+        "async fn main_() -> Result<(), CliError> {
+    let args = std::env::args().collect::<Vec<_>>();
+    if args.len() < 2 {
+        let cmd = <Cli as CommandFactory>::command().name(\"Cosmian KMS\");
+        klask::run_app(cmd, klask::Settings::default(), |_| {});
+        return Ok(())
+    }\n\n",
     );
 
     std::fs::write("./src/main.rs", content.as_bytes()).unwrap();

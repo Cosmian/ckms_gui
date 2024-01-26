@@ -2868,7 +2868,7 @@ dependencies = [
 
 [[package]]
 name = "kms_gui"
-version = "0.1.6"
+version = "0.1.7"
 dependencies = [
  "clap",
  "cosmian_crypto_core",
@@ -2876,6 +2876,7 @@ dependencies = [
  "cosmian_logger",
  "klask",
  "reqwest",
+ "serde",
  "tokio",
 ]
 
