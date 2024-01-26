@@ -2,6 +2,7 @@
 name = "kms_gui"
 version = "0.1.7"
 edition = "2021"
+description = "Graphical interface to interact with Cosmian KMS"
 
 
 [dependencies]

@@ -37,7 +37,7 @@ fn main() {
         "async fn main_() -> Result<(), CliError> {
     let args = std::env::args().collect::<Vec<_>>();
     if args.len() < 2 {
-        let cmd = <Cli as CommandFactory>::command();
+        let cmd = <Cli as CommandFactory>::command().name(\"Cosmian KMS\");
         klask::run_app(cmd, klask::Settings::default(), |_| {});
         return Ok(())
     }\n\n",
