@@ -1098,6 +1098,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "ckms_gui"
+version = "0.1.7"
+dependencies = [
+ "clap",
+ "cosmian_crypto_core",
+ "cosmian_kms_cli",
+ "cosmian_logger",
+ "klask",
+ "reqwest",
+ "serde",
+ "tokio",
+]
+
+[[package]]
 name = "clap"
 version = "4.4.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2864,20 +2878,6 @@ dependencies = [
  "rfd",
  "thiserror",
  "uuid",
-]
-
-[[package]]
-name = "kms_gui"
-version = "0.1.7"
-dependencies = [
- "clap",
- "cosmian_crypto_core",
- "cosmian_kms_cli",
- "cosmian_logger",
- "klask",
- "reqwest",
- "serde",
- "tokio",
 ]
 
 [[package]]

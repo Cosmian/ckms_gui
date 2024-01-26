@@ -24,15 +24,15 @@ jobs:
               rustup target add x86_64-apple-darwin
             build: |
               cargo build --release --target x86_64-apple-darwin
-            archive_name: kms_gui_macos
-            kms_gui: ./target/x86_64-apple-darwin/release/kms_gui
+            archive_name: ckms_gui_macos
+            ckms_gui: ./target/x86_64-apple-darwin/release/ckms_gui
           - os: ubuntu-22.04
             prerequisites: |
               sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
             build: |
               cargo build --release
-            archive_name: kms_gui_ubuntu_22_04
-            kms_gui: ./target/release/kms_gui
+            archive_name: ckms_gui_ubuntu_22_04
+            ckms_gui: ./target/release/ckms_gui
           # - os: ubuntu-22.04
           #   prerequisites: |
           #     sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev
@@ -40,8 +40,8 @@ jobs:
           #     rustup target add x86_64-pc-windows-gnu
           #   build: |
           #     cargo build --release --target x86_64-pc-windows-gnu
-          #   archive_name: kms_gui_windows
-          #   kms_gui: ./target/x86_64-pc-windows-gnu/release/kms_gui
+          #   archive_name: ckms_gui_windows
+          #   ckms_gui: ./target/x86_64-pc-windows-gnu/release/ckms_gui
 
     steps:
       - uses: actions/checkout@v3
@@ -92,7 +92,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.archive_name }}
-          path: ${{ matrix.kms_gui }}
+          path: ${{ matrix.ckms_gui }}
           retention-days: 1
           if-no-files-found: error
 
@@ -108,9 +108,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - archive_name: kms_gui_macos
-          - archive_name: kms_gui_ubuntu_22_04
-          # - archive_name: kms_gui_windows
+          - archive_name: ckms_gui_macos
+          - archive_name: ckms_gui_ubuntu_22_04
+          # - archive_name: ckms_gui_windows
 
     steps:
       - uses: actions/download-artifact@v3

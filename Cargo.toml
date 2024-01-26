@@ -1,8 +1,8 @@
 [package]
-name = "kms_gui"
+name = "ckms_gui"
 version = "0.1.7"
 edition = "2021"
-description = "Graphical interface to interact with Cosmian KMS"
+description = "Graphical interface for the CLI to interact with Cosmian KMS"
 
 
 [dependencies]

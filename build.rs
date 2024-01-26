@@ -7,7 +7,7 @@ struct Release {
 
 fn main() {
     let client = reqwest::blocking::Client::builder()
-        .user_agent("Cosmian/KMS_GUI")
+        .user_agent("Cosmian/CKMS_GUI")
         .build()
         .unwrap();
 
