@@ -1099,7 +1099,7 @@ dependencies = [
 
 [[package]]
 name = "ckms_gui"
-version = "0.1.8"
+version = "0.1.7"
 dependencies = [
  "clap",
  "cosmian_crypto_core",
