@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.16.0] - 2024-05-07
+
+- Following version of KMS
+
 ## [0.1.7] - 2024-01-26
 
 ### Changes
