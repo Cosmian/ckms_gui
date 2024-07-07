@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.17.0] - 2024-07-07
+
+### ⚙️ Miscellaneous Tasks
+
+- Bump to KMS version 4.17.0
+
 ## [4.16.0] - 2024-05-07
 
 - Following version of KMS

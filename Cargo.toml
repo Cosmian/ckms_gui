@@ -8,12 +8,13 @@ description = "Graphical interface for the CLI to interact with Cosmian KMS"
 [dependencies]
 clap = "4.4"
 cosmian_crypto_core = { version = "9.3", features = ["certificate"] }
-cosmian_kms_cli = { git = "https://github.com/Cosmian/kms.git", version = "4.16.0", package = "cosmian_kms_cli" }
-cosmian_kms_client = { git = "https://github.com/Cosmian/kms.git", version = "4.16.0", package = "cosmian_kms_client" }
-cosmian_logger = { git = "https://github.com/Cosmian/kms.git", version = "4.16.0", package = "cosmian_logger" }
+cosmian_kms_cli = { git = "https://github.com/Cosmian/kms.git", version = "4.17.0", package = "cosmian_kms_cli" }
+cosmian_kms_client = { git = "https://github.com/Cosmian/kms.git", version = "4.17.0", package = "cosmian_kms_client" }
+cosmian_logger = { git = "https://github.com/Cosmian/kms.git", version = "4.17.0", package = "cosmian_logger" }
 klask = { git = "https://github.com/Cosmian/klask.git" }
 tokio = { version = "1.34", features = ["full"] }
 env_logger = "0.11"
+tracing = "0.1"
 
 [build-dependencies]
 reqwest = { version = "0.11", features = ["blocking", "json"] }
