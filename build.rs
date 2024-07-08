@@ -1,8 +1,31 @@
+use std::process;
+
 use serde::Deserialize;
 
 #[derive(Deserialize)]
 struct Release {
     tag_name: String,
+}
+
+fn get_latest_kms_release(client: &reqwest::blocking::Client) -> Option<String> {
+    std::env::var("VERSION")
+        .ok()
+        .filter(|version| !version.is_empty())
+        .or_else(|| {
+            client
+                .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
+                .send()
+                .ok()
+                .and_then(|response| response.json::<Release>().ok())
+                .and_then(|release| {
+                    if release.tag_name.is_empty() {
+                        None
+                    } else {
+                        Some(release.tag_name)
+                    }
+                })
+                .or_else(|| option_env!("CARGO_PKG_VERSION").map(|version| version.to_string()))
+        })
 }
 
 fn main() {
@@ -12,14 +35,11 @@ fn main() {
         .unwrap();
 
     // typically the `VERSION` env var is set by the KMS CI release pipeline
-    let latest_kms_release = std::env::var("VERSION").unwrap_or_else(|_| {
-        client
-            .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
-            .send()
-            .unwrap()
-            .json::<Release>()
-            .unwrap()
-            .tag_name
+    let latest_kms_release = get_latest_kms_release(&client);
+
+    let latest_kms_release = latest_kms_release.unwrap_or_else(|| {
+        println!("Latest KMS release version cannot be empty");
+        process::exit(1);
     });
 
     println!("cargo:warning=Using KMS release {latest_kms_release}");
