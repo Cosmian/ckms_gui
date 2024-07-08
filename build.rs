@@ -12,7 +12,7 @@ fn get_latest_kms_release(client: &reqwest::blocking::Client) -> Option<String> 
         .ok()
         .filter(|version| !version.is_empty())
         .or_else(|| {
-            for _ in 0..5 {
+            for _ in 0..10 {
                 if let Ok(response) = client
                     .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
                     .send()
@@ -24,7 +24,7 @@ fn get_latest_kms_release(client: &reqwest::blocking::Client) -> Option<String> 
                     }
                 }
                 // Wait for a short period before retrying
-                std::thread::sleep(Duration::from_secs(2));
+                std::thread::sleep(Duration::from_secs(30));
             }
             None
         })
