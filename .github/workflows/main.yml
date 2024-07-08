@@ -80,6 +80,11 @@ jobs:
     needs:
       - kms-gui-build
     runs-on: [self-hosted, not-sgx]
+    container:
+      image: cosmian/docker_doc_ci
+      volumes:
+        - /home/cosmian/.ssh/id_rsa:/root/.ssh/id_rsa
+
     strategy:
       fail-fast: false
       matrix:
@@ -96,6 +101,7 @@ jobs:
       - name: Creating zip to be attached to release
         run: |
           sudo apt-get install -y zip
+          rm -f ${{ matrix.archive_name }}.zip
           zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
 
       - name: Push to package.cosmian.com
@@ -103,8 +109,8 @@ jobs:
         run: |
           set -x
           DESTINATION_DIR=/mnt/package/kms/$VERSION
-          ssh cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
-          scp ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
+          ssh -o 'StrictHostKeyChecking no' -i /root/.ssh/id_rsa cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
+          scp -o 'StrictHostKeyChecking no' -i /root/.ssh/id_rsa ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
         env:
           VERSION: ${{ inputs.kms_version }}
 
