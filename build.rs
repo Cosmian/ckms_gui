@@ -1,4 +1,4 @@
-use std::{process, time::Duration};
+use std::process;
 
 use serde::Deserialize;
 
@@ -12,21 +12,19 @@ fn get_latest_kms_release(client: &reqwest::blocking::Client) -> Option<String> 
         .ok()
         .filter(|version| !version.is_empty())
         .or_else(|| {
-            for _ in 0..10 {
-                if let Ok(response) = client
-                    .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
-                    .send()
-                {
-                    if let Ok(release) = response.json::<Release>() {
-                        if !release.tag_name.is_empty() {
-                            return Some(release.tag_name);
-                        }
+            client
+                .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
+                .send()
+                .ok()
+                .and_then(|response| response.json::<Release>().ok())
+                .and_then(|release| {
+                    if release.tag_name.is_empty() {
+                        None
+                    } else {
+                        Some(release.tag_name)
                     }
-                }
-                // Wait for a short period before retrying
-                std::thread::sleep(Duration::from_secs(30));
-            }
-            None
+                })
+                .or_else(|| option_env!("CARGO_PKG_VERSION").map(|version| version.to_string()))
         })
 }
 
