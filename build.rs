@@ -1,3 +1,5 @@
+use std::process;
+
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -22,6 +24,10 @@ fn main() {
             .tag_name
     });
 
+    if latest_kms_release.is_empty() {
+        println!("Latest KMS release version cannot be empty");
+        process::exit(1);
+    }
     println!("cargo:warning=Using KMS release {latest_kms_release}");
 
     // get `ckms` `main.rs` file
