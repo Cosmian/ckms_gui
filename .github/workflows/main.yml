@@ -100,7 +100,7 @@ jobs:
 
       - name: Creating zip to be attached to release
         run: |
-          sudo apt-get install -y zip
+          apt-get install -y zip
           rm -f ${{ matrix.archive_name }}.zip
           zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
 
