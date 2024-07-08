@@ -42,7 +42,7 @@ jobs:
             ckms_gui: ./target/release/ckms_gui
           - os: ubuntu-24.04
             prerequisites: |
-              sudo apt install libssl-dev pkg-config
+              sudo apt install libglib2.0-dev libssl-dev pkg-config
             build: |
               cargo build --release
             archive_name: ckms_gui_ubuntu_24_04
