@@ -7,6 +7,21 @@ struct Release {
     tag_name: String,
 }
 
+fn get_latest_kms_release(client: &reqwest::blocking::Client) -> String {
+    std::env::var("VERSION")
+        .ok()
+        .filter(|version| !version.is_empty())
+        .unwrap_or_else(|| {
+            client
+                .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
+                .send()
+                .unwrap()
+                .json::<Release>()
+                .unwrap()
+                .tag_name
+        })
+}
+
 fn main() {
     let client = reqwest::blocking::Client::builder()
         .user_agent("Cosmian/CKMS_GUI")
@@ -14,15 +29,7 @@ fn main() {
         .unwrap();
 
     // typically the `VERSION` env var is set by the KMS CI release pipeline
-    let latest_kms_release = std::env::var("VERSION").unwrap_or_else(|_| {
-        client
-            .get("https://api.github.com/repos/Cosmian/kms/releases/latest")
-            .send()
-            .unwrap()
-            .json::<Release>()
-            .unwrap()
-            .tag_name
-    });
+    let latest_kms_release = get_latest_kms_release(&client);
 
     if latest_kms_release.is_empty() {
         println!("Latest KMS release version cannot be empty");
