@@ -42,20 +42,18 @@ jobs:
             ckms_gui: ./target/release/ckms_gui
           - os: ubuntu-24.04
             prerequisites: |
-              sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
+              sudo apt install libssl-dev pkg-config
             build: |
               cargo build --release
             archive_name: ckms_gui_ubuntu_24_04
             ckms_gui: ./target/release/ckms_gui
-          # - os: ubuntu-22.04
-          #   prerequisites: |
-          #     sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev
-          #     sudo apt-get install --no-install-recommends -qq libclang-dev gcc-mingw-w64-x86-64
-          #     rustup target add x86_64-pc-windows-gnu
-          #   build: |
-          #     cargo build --release --target x86_64-pc-windows-gnu
-          #   archive_name: ckms_gui_windows
-          #   ckms_gui: ./target/x86_64-pc-windows-gnu/release/ckms_gui
+          - os: windows-2022
+            prerequisites: |
+              rustup target add x86_64-pc-windows-gnu
+            build: |
+              cargo build --release --target x86_64-pc-windows-gnu
+            archive_name: ckms_gui_windows
+            ckms_gui: ./target/x86_64-pc-windows-gnu/release/ckms_gui
 
     steps:
       - uses: actions/checkout@v3
@@ -111,7 +109,7 @@ jobs:
           - archive_name: ckms_gui_macos14
           - archive_name: ckms_gui_ubuntu_22_04
           - archive_name: ckms_gui_ubuntu_24_04
-          # - archive_name: ckms_gui_windows
+          - archive_name: ckms_gui_windows
 
     steps:
       - uses: actions/download-artifact@v3
