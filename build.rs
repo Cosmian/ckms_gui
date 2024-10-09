@@ -56,8 +56,8 @@ fn main() {
 
     // install Klask hook
     let content = content.replace(
-        "async fn main_() -> Result<(), CliError> {\n",
-        "async fn main_() -> Result<(), CliError> {
+        "async fn main_() -> CliResult<()> {\n",
+        "async fn main_() -> CliResult<()> {
     let args = std::env::args().collect::<Vec<_>>();
     if args.len() < 2 {
         let cmd = <Cli as CommandFactory>::command().name(\"Cosmian KMS\");

@@ -98,6 +98,13 @@ async fn main() {
 }
 
 async fn main_() -> CliResult<()> {
+    let args = std::env::args().collect::<Vec<_>>();
+    if args.len() < 2 {
+        let cmd = <Cli as CommandFactory>::command().name("Cosmian KMS");
+        klask::run_app(cmd, klask::Settings::default(), |_| {});
+        return Ok(())
+    }
+
     log_init(None);
     let opts = Cli::parse();
 
