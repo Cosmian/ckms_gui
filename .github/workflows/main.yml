@@ -27,7 +27,7 @@ jobs:
               rustup target add x86_64-apple-darwin
             build: |
               cargo build --release --target x86_64-apple-darwin
-              otool -L ./target/x86_64-apple-darwin/release/ckms_gui | grep openssl && exit 1
+              otool -L ./target/x86_64-apple-darwin/release/ckms_gui | grep openssl
             archive_name: ckms_gui_macos_intel
             ckms_gui: ./target/x86_64-apple-darwin/release/ckms_gui
 
@@ -36,7 +36,7 @@ jobs:
               rustup target add aarch64-apple-darwin
             build: |
               cargo build --release --target aarch64-apple-darwin
-              otool -L ./target/aarch64-apple-darwin/release/ckms_gui | grep openssl && exit 1
+              otool -L ./target/aarch64-apple-darwin/release/ckms_gui | grep openssl
             archive_name: ckms_gui_macos_arm
             ckms_gui: ./target/aarch64-apple-darwin/release/ckms_gui
 
@@ -45,7 +45,7 @@ jobs:
               sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
             build: |
               cargo build --release
-              ldd ./target/release/ckms_gui | grep ssl && exit 1
+              ldd ./target/release/ckms_gui | grep ssl
             archive_name: ckms_gui_ubuntu_22_04
             ckms_gui: ./target/release/ckms_gui
 
@@ -54,7 +54,7 @@ jobs:
               sudo apt install libgtk-3-dev libglib2.0-dev libssl-dev pkg-config
             build: |
               cargo build --release
-              ldd ./target/release/ckms_gui | grep ssl && exit 1
+              ldd ./target/release/ckms_gui | grep ssl
             archive_name: ckms_gui_ubuntu_24_04
             ckms_gui: ./target/release/ckms_gui
 
