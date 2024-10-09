@@ -123,6 +123,7 @@ jobs:
           zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
 
       - name: Push to package.cosmian.com
+        shell: bash
         run: |
           set -x
           if [[ "${GITHUB_REF}" =~ 'refs/tags/' ]]; then
