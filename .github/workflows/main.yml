@@ -30,6 +30,7 @@ jobs:
               otool -L ./target/x86_64-apple-darwin/release/ckms_gui | grep openssl && exit 1
             archive_name: ckms_gui_macos_intel
             ckms_gui: ./target/x86_64-apple-darwin/release/ckms_gui
+
           - os: macos-14
             prerequisites: |
               rustup target add aarch64-apple-darwin
@@ -38,6 +39,7 @@ jobs:
               otool -L ./target/aarch64-apple-darwin/release/ckms_gui | grep openssl && exit 1
             archive_name: ckms_gui_macos_arm
             ckms_gui: ./target/aarch64-apple-darwin/release/ckms_gui
+
           - os: ubuntu-22.04
             prerequisites: |
               sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
@@ -46,6 +48,7 @@ jobs:
               ldd ./target/release/ckms_gui | grep ssl && exit 1
             archive_name: ckms_gui_ubuntu_22_04
             ckms_gui: ./target/release/ckms_gui
+
           - os: ubuntu-24.04
             prerequisites: |
               sudo apt install libgtk-3-dev libglib2.0-dev libssl-dev pkg-config
@@ -73,6 +76,7 @@ jobs:
         run: ${{ matrix.prerequisites }}
 
       - name: Build
+        shell: bash
         run: ${{ matrix.build }}
         env:
           VERSION: ${{ inputs.kms_version }}
