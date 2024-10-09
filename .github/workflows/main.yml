@@ -11,6 +11,9 @@ on:
         type: string
         default: "4.19.0"
 
+env:
+  OPENSSL_DIR: /usr/local/openssl
+
 jobs:
   kms-gui-build:
     name: Build on ${{ matrix.archive_name }}
@@ -54,6 +57,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
+      - name: Local OpenSSL FIPS Install
+        run: |
+          sudo mkdir -p ${{ env.OPENSSL_DIR }}
+          sudo chown -R $USER ${{ env.OPENSSL_DIR }}
+          bash .github/scripts/local_ossl_instl.sh ${{ env.OPENSSL_DIR }}
 
       - uses: dtolnay/rust-toolchain@master
         with:
