@@ -9,7 +9,10 @@ on:
       kms_version:
         description: KMS version
         type: string
-        default: '4.18.0'
+        default: "4.19.0"
+
+env:
+  OPENSSL_DIR: /usr/local/openssl
 
 jobs:
   kms-gui-build:
@@ -26,6 +29,7 @@ jobs:
               cargo build --release --target x86_64-apple-darwin
             archive_name: ckms_gui_macos_intel
             ckms_gui: ./target/x86_64-apple-darwin/release/ckms_gui
+
           - os: macos-14
             prerequisites: |
               rustup target add aarch64-apple-darwin
@@ -33,6 +37,7 @@ jobs:
               cargo build --release --target aarch64-apple-darwin
             archive_name: ckms_gui_macos_arm
             ckms_gui: ./target/aarch64-apple-darwin/release/ckms_gui
+
           - os: ubuntu-22.04
             prerequisites: |
               sudo apt install librust-atk-sys-dev librust-gdk-sys-dev libssl-dev pkg-config
@@ -40,6 +45,7 @@ jobs:
               cargo build --release
             archive_name: ckms_gui_ubuntu_22_04
             ckms_gui: ./target/release/ckms_gui
+
           - os: ubuntu-24.04
             prerequisites: |
               sudo apt install libgtk-3-dev libglib2.0-dev libssl-dev pkg-config
@@ -51,6 +57,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Local OpenSSL FIPS Install
+        run: |
+          sudo mkdir -p ${{ env.OPENSSL_DIR }}
+          sudo chown -R $USER ${{ env.OPENSSL_DIR }}
+          bash .github/scripts/local_ossl_instl.sh ${{ env.OPENSSL_DIR }}
+
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly-2024-06-09
@@ -60,9 +72,14 @@ jobs:
         run: ${{ matrix.prerequisites }}
 
       - name: Build
+        shell: bash
         run: ${{ matrix.build }}
         env:
           VERSION: ${{ inputs.kms_version }}
+
+      - name: Check OpenSSL link
+        run: |
+          bash .github/scripts/check_openssl.sh ${{ matrix.ckms_gui }}
 
       - name: Upload KMS for ${{ matrix.os }}
         uses: actions/upload-artifact@v3
@@ -106,14 +123,16 @@ jobs:
           zip -r ${{ matrix.archive_name }}.zip ${{ matrix.archive_name }}
 
       - name: Push to package.cosmian.com
-        if: inputs.kms_version
         run: |
           set -x
-          DESTINATION_DIR=/mnt/package/kms/$VERSION
+          if [[ "${GITHUB_REF}" =~ 'refs/tags/' ]]; then
+            BRANCH="${GITHUB_REF_NAME}"
+          else
+            BRANCH="last_build/${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          fi
+          DESTINATION_DIR=/mnt/package/kms/$BRANCH
           ssh -o 'StrictHostKeyChecking no' -i /root/.ssh/id_rsa cosmian@package.cosmian.com mkdir -p $DESTINATION_DIR
           scp -o 'StrictHostKeyChecking no' -i /root/.ssh/id_rsa ${{ matrix.archive_name }}.zip cosmian@package.cosmian.com:$DESTINATION_DIR/
-        env:
-          VERSION: ${{ inputs.kms_version }}
 
       - name: Release on tags, attach asset on release
         if: startsWith(github.ref, 'refs/tags/')
