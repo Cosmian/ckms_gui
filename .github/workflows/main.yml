@@ -9,7 +9,7 @@ on:
       kms_version:
         description: KMS version
         type: string
-        default: "4.19.0"
+        default: "4.19.3"
 
 env:
   OPENSSL_DIR: /usr/local/openssl
