@@ -1,6 +1,6 @@
 [package]
 name = "ckms_gui"
-version = "4.19.0"
+version = "4.19.3"
 edition = "2021"
 description = "Graphical interface for the CLI to interact with Cosmian KMS"
 
